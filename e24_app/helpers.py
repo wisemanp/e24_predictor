@@ -9,6 +9,7 @@ def fetch_results(team_id, test=False):
         url = f"https://results.resultsbase.net/myresults.aspx?CId=8&RId=20854&EId=1&AId={team_id}"
     print('Fetching results from:', url)
     response = requests.get(url)
+    print(response.status_code, response.reason,response.text)
     soup = BeautifulSoup(response.text, "html.parser")
     
     # Extract table data
