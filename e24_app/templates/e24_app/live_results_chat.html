@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Endure24 Race Timing</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 90%;
+      padding: 4px;
+    }
+
+    button {
+      padding: 4px 10px;
+      font-size: 13px;
+      height: auto;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #555;
+      text-align: center;
+    }
+
+    .completed {
+      background-color: #d4edda !important;
+    }
+
+    .greyed-out {
+      background-color: #e0e0e0 !important;
+      color: #888;
+    }
+
+    .hidden-table {
+      display: none;
+    }
+
+    #raceTable thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f4f4f4;
+      z-index: 1;
+    }
+
+    .team-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    #teamPredictions th:first-child,
+    #teamPredictions td:first-child {
+      width: 120px;
+      white-space: nowrap;
+    }
+
+    #runnerCountdowns {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+    .runner-timer {
+      flex: 1;
+      text-align: center;
+      background-color: #f4f4f4;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .runner-timer.warning {
+      background-color: #fff3cd !important;
+    }
+    .runner-timer.urgent {
+      background-color: #f8d7da !important;
+    }
+
+    .runner-name-display {
+      font-size: 1em;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+    .runner-countdown-value {
+      font-size: 1.2em;
+    }
+
+    .on-course {
+      background-color: #fff9c4 !important;
+    }
+    .on-course-label {
+      display: block;
+      font-size: 0.9em;
+      color: #000;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .next-to-run-label {
+      display: block;
+      font-size: 0.9em;
+      color: #000;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .highlight-current {
+      background-color: #fff9c4 !important;
+    }
+</style>
+</head>
+<body>
+<form style="display: none;">{% csrf_token %}</form>
+<span id="fixedLapCount" style="display: none;">{{ fixed_laps }}</span>
+
+<h1>Endure24 Race Timing</h1>
+
+<span id="cumulativeTime" style="display: none;">{{ cumulative_time }}</span>
+
+<!-- Runner Countdown Section -->
+<div id="runnerCountdowns" style="margin-bottom: 20px;">
+  <h2>Next Lap Countdown</h2>
+  {% for runner in runners %}
+  <div class="runner-timer" data-runner-index="{{ forloop.counter0 }}">
+    <div class="runner-name-display">{{ runner.name }}</div>
+    <div class="runner-countdown-value">--:--:--</div>
+    <div class="on-course-label"></div>
+    <div class="next-to-run-label"></div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Team Predictions Section -->
+<div class="team-container">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1px;">
+    <h2 style="margin: 1;">Team Predictions</h2>
+    <button onclick="confirmPopulate()">Populate Predictions</button>
+    <button onclick="togglePredictionTable()">Hide/Show Team Predictions</button>
+  </div>
+  <div id="teamPredictionWrapper">
+    <div style="margin-bottom: 10px;">
+      <label for="lapCount">Lap Rows:</label>
+      <input id="lapCount" min="1" onchange="generateLapRows()" style="width: 60px;" type="number" value="30"/>
+    </div>
+    <table id="teamPredictions" style="width: 80%; margin-top: 0;">
+      <thead>
+        <tr>
+          <th>Runner</th>
+          <th>Name</th>
+          <th>Predicted Minutes</th>
+          <th>Predicted Seconds</th>
+          <th>D Factor</th>
+          <th>Pace</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for runner in runners %}
+        <tr>
+          <td>{{ runner.name }}</td>
+          <td>
+            <select class="runner-dropdown">
+              <option value="{{ runner.name }}">{{ runner.name }}</option>
+            </select>
+          </td>
+          <td>
+            <input type="number" class="runner-minutes" min="0" placeholder="Minutes">
+          </td>
+          <td>
+            <input type="number" class="runner-seconds" min="0" max="59" placeholder="Seconds">
+          </td>
+          <td>
+            <input type="number" class="runner-dfactor" min="1" step="0.01" placeholder="D Factor" value="1.05">
+          </td>
+          <td><span class="runner-pace">-</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Race Results Section -->
+<div class="race-header">Race Results</div>
+<table id="raceTable">
+  <thead>
+    <tr>
+      <th>Lap</th>
+      <th>Lap Start Time</th>
+      <th>Runner</th>
+      <th>Laptime</th>
+      <th>Pace</th>
+      <th>Total Time</th>
+      <th>Lap Complete</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for lap in laps %}
+  <tr class="{% if lap.fixed %}completed{% endif %}">
+    <td>{{ lap.number }}</td>
+    <td class="start-time">{{ lap.start_time }}</td>
+    <td>{{ lap.runner }}</td>
+    <td>{{ lap.laptime }}</td>
+    <td class="pace-cell">{{ lap.pace }}</td>
+    <td class="total-time">{{ lap.total_time }}</td>
+    <td>
+      {% if lap.fixed %}
+      <input type="checkbox" class="lap-complete" checked disabled>
+      {% else %}
+      <input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();">
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<footer>
+  <p>Data is saved locally in your browser's localStorage. It will persist across page reloads and browser restarts.</p>
+</footer>
+
+<script src="{% static 'e24_app/js/live_results.js' %}"></script>
+</body>
+</html>
+

@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Endure24 Race Timing - The Graveyard Swift</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #c1a0da; /* Background color */
+      color: #333; /* Text color */
+      font-size: 1rem; /* Base font size */
+    }
+
+    h1, h2 {
+      color: #5c068c; /* Highlight color for headings */
+      font-size: 2rem; /* Scales with the base font size */
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+      background-color: #fff; /* White background for tables */
+      border: 2px solid #5c068c; /* Highlight border */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #5c068c; /* Highlight color for table headers */
+      color: #fff; /* White text */
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 90%;
+      padding: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 6px 12px;
+      font-size: 14px;
+      height: auto;
+      background-color: #5c068c; /* Highlight color for buttons */
+      color: #fff; /* White text */
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #4a056e; /* Darker highlight on hover */
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #555;
+      text-align: center;
+    }
+
+    .completed {
+      background-color: #d4edda !important; /* Light green background */
+      color: #155724; /* Dark green text */
+    }
+
+    .race-header {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #5c068c; /* Highlight color */
+    }
+
+    .greyed-out {
+      background-color: #e0e0e0 !important; /* Grey background */
+      color: #888; /* Grey text */
+    }
+
+    .hidden-table {
+      display: none;
+    }
+
+    #raceTable thead th {
+      position: sticky;
+      top: 0;
+      background-color: #5c068c; /* Highlight color for sticky headers */
+      color: #fff; /* White text */
+      z-index: 1;
+    }
+
+    .team-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      background-color: #c1a0da; /* Background color for team container */
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    #teamPredictions th:first-child,
+    #teamPredictions td:first-child {
+      width: 120px;
+      white-space: nowrap;
+    }
+
+    #runnerCountdowns {
+      display: flex;
+      flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      background-color: #c1a0da; /* Background color for countdowns */
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    }
+
+    .runner-timer {
+      flex: 1 1 calc(50% - 10px); /* Adjust width for smaller screens */
+      text-align: center;
+      background-color: #f4f4f4; /* White background for timers */
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1.1em;
+      border: 2px solid #5c068c; /* Highlight border */
+    }
+
+    .runner-timer.warning {
+      background-color: #fff3cd !important; /* Warning background */
+    }
+
+    .runner-timer.urgent {
+      background-color: #f8d7da !important; /* Urgent background */
+    }
+
+    .highlight-current {
+      background-color: #fff9c4 !important; /* Yellow background for current lap */
+    }
+
+    .next-lap {
+      background-color: #f8d7da !important; /* Light red background for next lap */
+      color: #721c24; /* Dark red text */
+    }
+
+    .on-course {
+      background-color: #5c068c !important; /* Highlight color for on-course runner */
+      color: #fff; /* White text */
+    }
+
+    .on-course-label {
+      display: block;
+      font-size: 0.9em;
+      color: #fff; /* White text */
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    .next-to-run {
+      background-color: silver !important; /* Silver background for next-to-run */
+      color: #333; /* Dark text */
+    }
+
+    .next-to-run-label {
+      display: block;
+      font-size: 0.9em;
+      color: #333; /* Dark text */
+      margin-top: 6px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+  body {
+    padding: 10px; /* Reduce padding for smaller screens */
+  }
+
+  table {
+    width: 100%; /* Ensure tables fit within the screen */
+    font-size: 0.9em; /* Reduce font size for smaller screens */
+  }
+
+  .team-container {
+    flex-direction: column; /* Stack elements vertically */
+    padding: 5px; /* Reduce padding */
+  }
+
+  .runner-timer {
+    font-size: 0.9em; /* Adjust font size for timers */
+    padding: 5px; /* Reduce padding */
+  }
+
+  button {
+    font-size: 12px; /* Smaller buttons for mobile */
+    padding: 4px 8px; /* Adjust button padding */
+  }
+}
+  </style>
+</head>
+<body onload="loadData()">
+{% load static %}
+<form style="display: none;">{% csrf_token %}</form>
+<span id="fixedLapCount" style="display: none;">{{ fixed_laps }}</span>
+
+<h1>Endure24 Race Timing - The Graveyard Swift</h1>
+
+<span id="cumulativeTime" style="display: none;">{{ cumulative_time }}</span>
+
+<!-- Runner Countdown Section -->
+<div id="runnerCountdowns" style="margin-bottom: 20px;">
+  <h2>Next Lap Countdown</h2>
+  {% for runner in runners %}
+  <div class="runner-timer" data-runner-index="{{ forloop.counter0 }}">
+    <div class="runner-name-display">{{ runner.name }}</div>
+    <div class="runner-countdown-value">--:--:--</div>
+    <div class="on-course-label"></div>
+    <div class="next-to-run-label"></div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Team Predictions Section -->
+<div class="team-container">
+  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1px;">
+    <h2 style="margin: 1;">Team Predictions</h2>
+    <button onclick="confirmPopulate()">Populate Predictions</button>
+    <button onclick="togglePredictionTable()">Hide/Show Team Predictions</button>
+  </div>
+  <div id="teamPredictionWrapper">
+    <div style="margin-bottom: 10px;">
+      <label for="lapCount">Lap Rows:</label>
+      <input id="lapCount" min="1" onchange="generateLapRows()" style="width: 60px;" type="number" value="30"/>
+    </div>
+    <table id="teamPredictions" style="width: 80%; margin-top: 0;">
+      <thead>
+        <tr>
+          <th>Runner</th>
+          <th>Predicted Minutes</th>
+          <th>Predicted Seconds</th>
+          <th>D Factor</th>
+          <th>Pace</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for runner in runners %}
+        <tr>
+          <td>
+            <select class="runner-dropdown">
+              <option value="">Select Runner</option>
+              {% for runner_option in runners %}
+              <option value="{{ runner_option.name }}">{{ runner_option.name }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <input type="number" class="runner-minutes" min="0" placeholder="Minutes">
+          </td>
+          <td>
+            <input type="number" class="runner-seconds" min="0" max="59" placeholder="Seconds">
+          </td>
+          <td>
+            <input type="number" class="runner-dfactor" min="1" step="0.01" placeholder="D Factor" value="1.05">
+          </td>
+          <td><span class="runner-pace">-</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Race Results Section -->
+<div class="race-header">Race Results</div>
+<table id="raceTable">
+  <thead>
+    <tr>
+      <th>Lap</th>
+      <th>Lap Start Time</th>
+      <th>Runner</th>
+      <th>Laptime</th>
+      <th>Pace</th>
+      <th>Total Time</th>
+      <th>Lap Complete / Fix Predictions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for lap in laps %}
+    <tr class="{% if lap.fixed %}completed{% endif %}" 
+    {% if not lap.completed and not lap.runner_field and lap.fixed %}data-fixed-prediction="true"{% endif %}>
+
+      <td>{{ lap.number }}</td>
+      <td class="start-time">
+        {% if lap.fixed %}
+          {{ lap.start_time }}
+        {% else %}
+          <input type="text" class="start-time-input" value="{{ lap.start_time }}" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();">
+        {% endif %}
+      </td>
+      <td>
+        {% if lap.fixed %}
+          {{ lap.runner }}
+        {% else %}
+          <input type="text" class="runner-field" value="{{ lap.runner }}" placeholder="Runner">
+        {% endif %}
+      </td>
+      <td>
+        {% if lap.fixed %}
+          {{ lap.laptime }}
+        {% else %}
+          <input type="text" class="laptime" value="{{ lap.laptime }}" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();">
+        {% endif %}
+      </td>
+      <td class="pace-cell">
+        {% if lap.fixed %}
+          {{ lap.pace }}
+        {% else %}
+          <span class="pace-cell">-</span>
+        {% endif %}
+      </td>
+      <td class="total-time">
+        {% if lap.fixed %}
+          {{ lap.total_time }}
+        {% else %}
+          <span class="total-time">-</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if lap.fixed %}
+          <input type="checkbox" class="lap-complete" checked disabled>
+        {% else %}
+          <input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();">
+        {% endif %}
+        <input type="checkbox" class="fix-row" onchange="applyFixUpToRow(this)">
+      </td>
+      
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<footer>
+  <p>Data is saved locally in your browser's localStorage. It will persist across page reloads and browser restarts.</p>
+</footer>
+
+<script>
+    function parseTime(str) {
+      const parts = str.split(":").map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return 0;
+      return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+
+    function formatTime(seconds) {
+      const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+      seconds %= 3600;
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      return `${hrs}:${mins}:${secs}`;
+    }
+
+    
+function updateTimes() {
+  const rows = document.querySelectorAll("#raceTable tbody tr");
+
+  // Get the cumulative time after fixed laps from the hidden element
+  const cumulativeTimeStr = document.getElementById("cumulativeTime").textContent;
+  let cumulativeSeconds = parseTime(cumulativeTimeStr); // Use cumulativeTime from the backend
+
+  const baseTime = new Date();
+  baseTime.setHours(12, 0, 0, 0); // Day 1 start time: 12:00:00
+
+  const cutoffTime = new Date(baseTime.getTime() + 24 * 3600 * 1000); // 24 hours later: 12:00:00 Day 2
+
+  rows.forEach((row) => {
+    const laptimeInput = row.querySelector(".laptime");
+    if (!laptimeInput) return;
+
+    const totalTimeCell = row.querySelector(".total-time");
+    const startTimeCell = row.querySelector(".start-time");
+    const paceCell = row.querySelector(".pace-cell");
+
+    const laptime = parseTime(laptimeInput.value);
+    const startTime = new Date(baseTime.getTime() + cumulativeSeconds * 1000);
+    startTimeCell.textContent = startTime.toTimeString().substring(0, 8);
+
+    cumulativeSeconds += laptime;
+    totalTimeCell.textContent = formatTime(cumulativeSeconds);
+
+    console.log("Cumulative Time (seconds):", cumulativeSeconds);
+
+    if (laptime > 0) {
+      const pacePerKm = laptime / 8;
+      const paceMinutes = String(Math.floor(pacePerKm / 60)).padStart(2, "0");
+      const paceSeconds = String(Math.round(pacePerKm % 60)).padStart(2, "0");
+      paceCell.textContent = `${paceMinutes}:${paceSeconds}/km`;
+    } else {
+      paceCell.textContent = "-";
+    }
+
+    // Apply greyed-out class if startTime is after cutoff
+    if (startTime > cutoffTime) {
+      row.classList.add("greyed-out");
+    } else {
+      row.classList.remove("greyed-out");
+    }
+  });
+}
+
+
+    function updatePace(inputEl) {
+  const row = inputEl.closest("tr");
+  const minutes = row.querySelector(".runner-minutes").value;
+  const seconds = row.querySelector(".runner-seconds").value;
+  const paceCell = row.querySelector(".runner-pace");
+
+  const totalSeconds = (parseInt(minutes) || 0) * 60 + (parseInt(seconds) || 0);
+  if (totalSeconds === 0) {
+    paceCell.textContent = "-";
+    return;
+  }
+  const paceSecondsPerKm = totalSeconds / 8; // Assuming 8 km per lap
+  const paceMinutes = Math.floor(paceSecondsPerKm / 60);
+  const paceSeconds = Math.round(paceSecondsPerKm % 60).toString().padStart(2, '0');
+  paceCell.textContent = `${paceMinutes}:${paceSeconds}/km`;
+    }
+
+    function confirmPopulate() {
+  console.log("Confirm Populate triggered");
+  if (confirm("Are you sure?")) {
+    populateRunners();
+    saveData();
+  }
+}
+
+    
+
+    function toggleRowCompletion(checkbox) {
+      const row = checkbox.closest("tr");
+      if (checkbox.checked) {
+        row.classList.add("completed"); // Add the "completed" class
+        console.log(`Row ${row.rowIndex} marked as completed.`);
+      } else {
+        row.classList.remove("completed"); // Remove the "completed" class
+        console.log(`Row ${row.rowIndex} not completed.`);
+      }
+    }
+
+    
+
+function generateLapRows() {
+  const lapCount = parseInt(document.getElementById("lapCount").value) || 0;
+  const raceTableBody = document.querySelector("#raceTable tbody");
+  const currentRowCount = raceTableBody.querySelectorAll("tr").length;
+
+  // Get the cumulative time after fixed laps from the hidden element
+  const cumulativeTimeStr = document.getElementById("cumulativeTime").textContent;
+  let cumulativeSeconds = parseTime(cumulativeTimeStr); // Use cumulativeTime from the backend
+
+  const baseTime = new Date();
+  baseTime.setHours(12, 0, 0, 0); // Base start time: 12:00:00
+
+  // Add rows if the new lap count is greater than the current row count
+  for (let i = currentRowCount + 1; i <= lapCount; i++) {
+    const row = document.createElement("tr");
+    const startTime = new Date(baseTime.getTime() + cumulativeSeconds * 1000);
+
+    row.innerHTML = `
+      <td>${i}</td>
+      <td class="start-time">${startTime.toTimeString().substring(0, 8)}</td>
+      <td><input type="text" class="runner-field" placeholder="Runner"></td>
+      <td><input type="text" class="laptime" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();"></td>
+      <td class="pace-cell">-</td>
+      <td class="total-time"></td>
+      <td><input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();"></td>
+    `;
+    raceTableBody.appendChild(row);
+
+    // Update cumulative time (default lap time is 0 if not set)
+    cumulativeSeconds += 0;
+  }
+
+  // Remove rows if the new lap count is less than the current row count
+  while (raceTableBody.querySelectorAll("tr").length > lapCount) {
+    raceTableBody.removeChild(raceTableBody.lastChild);
+  }
+
+  setTimeout(updateTimes, 0);
+}
+  </script>
+<script>
+setInterval(updateCountdowns, 1000);
+function highlightPreviousLapRow() {
+  const now = new Date();
+  let closestNegativeDiff = -Infinity;
+  let closestRow = null;
+
+  document.querySelectorAll("#raceTable tbody tr").forEach(row => {
+    const startTimeCell = row.querySelector(".start-time");
+    if (startTimeCell && startTimeCell.textContent.includes(":")) {
+      const [h, m, s] = startTimeCell.textContent.split(":").map(Number);
+      const start = new Date();
+      start.setHours(h, m, s, 0);
+      const diff = start - now;
+      if (diff < 0 && diff > closestNegativeDiff) {
+        closestNegativeDiff = diff;
+        closestRow = row;
+      }
+    }
+
+    // Preserve the "completed" class while removing "highlight-current"
+    if (!row.classList.contains("completed")) {
+      row.classList.remove("highlight-current");
+    }
+  });
+
+  if (closestRow) {
+    closestRow.classList.add("highlight-current");
+  }
+}
+setInterval(highlightPreviousLapRow, 1000);
+function markRunnerOnCourse() {
+  const highlightedRow = document.querySelector("#raceTable tbody tr.highlight-current");
+  const countdownEls = document.querySelectorAll(".runner-timer");
+
+  // Reset all runners
+  countdownEls.forEach((el) => {
+    el.classList.remove("on-course");
+    el.querySelector(".on-course-label").textContent = "";
+  });
+
+  if (highlightedRow) {
+    const runnerName = highlightedRow.querySelector(".runner-field")?.value.trim();
+
+    countdownEls.forEach((el) => {
+      const displayName = el.querySelector(".runner-name-display").textContent.trim();
+      if (runnerName && displayName === runnerName) {
+        el.classList.add("on-course");
+        el.querySelector(".on-course-label").textContent = "On Course";
+      }
+    });
+  }
+}
+setInterval(markRunnerOnCourse, 1000);
+function markNextRunner() {
+  const countdownEls = document.querySelectorAll(".runner-timer");
+  let minSeconds = Infinity;
+  let nextRunner = null;
+
+  countdownEls.forEach((el) => {
+    el.classList.remove("next-to-run");
+    el.querySelector(".next-to-run-label").textContent = "";
+
+    const timeStr = el.querySelector(".runner-countdown-value").textContent;
+    if (timeStr && timeStr.includes(":")) {
+      const [h, m, s] = timeStr.split(":").map(Number);
+      const total = h * 3600 + m * 60 + s;
+      if (total < minSeconds) {
+        minSeconds = total;
+        nextRunner = el;
+      }
+    }
+  });
+
+  if (nextRunner) {
+    nextRunner.classList.add("next-to-run");
+    nextRunner.querySelector(".next-to-run-label").textContent = "Next to Run";
+  }
+}
+setInterval(markNextRunner, 1000);
+
+function updateCountdowns() {
+  const countdownEls = document.querySelectorAll(".runner-timer");
+  const rows = document.querySelectorAll("#raceTable tbody tr");
+  const now = new Date();
+
+  countdownEls.forEach((timerEl) => {
+    const runnerName = timerEl.querySelector(".runner-name-display").textContent.trim();
+    let nextStart = null;
+
+    rows.forEach((row) => {
+      let rowRunner = "";
+      if (row.querySelector(".runner-field")) {
+        rowRunner = row.querySelector(".runner-field").value.trim();
+      } else {
+        rowRunner = row.children[2]?.textContent.trim();
+      }
+
+      const startTimeCell = row.querySelector(".start-time");
+      if (!startTimeCell || !startTimeCell.textContent.includes(":")) return;
+
+      const [h, m, s] = startTimeCell.textContent.split(":").map(Number);
+      const raceStart = new Date();
+      raceStart.setHours(12, 0, 0, 0); // Day 1, 12:00:00
+
+      let start = new Date(raceStart);  // clone
+
+      // If lap time is earlier than race start (i.e., after midnight), add 1 day
+      if (h < 12) {
+        start.setDate(start.getDate() + 1);  // move to Day 2
+      }
+      start.setHours(h, m, s, 0);
+
+      const checkbox = row.querySelector(".lap-complete");
+
+      // Find the **next** start time for this runner in the future
+      if (
+        rowRunner === runnerName &&
+        start > now &&
+        (!nextStart || start < nextStart)
+      ) {
+        nextStart = start;
+      }
+    });
+
+    // Update display
+    if (nextStart) {
+      const diff = Math.floor((nextStart - now) / 1000);
+      const hrs = String(Math.floor(diff / 3600)).padStart(2, "0");
+      const mins = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
+      const secs = String(diff % 60).padStart(2, "0");
+
+      timerEl.querySelector(".runner-countdown-value").textContent = `${hrs}:${mins}:${secs}`;
+      updateCountdownColors(timerEl, diff);
+    } else {
+      timerEl.querySelector(".runner-countdown-value").textContent = "--:--:--";
+    }
+  });
+}
+
+
+function updateCountdownColors(timerEl, secondsLeft) {
+  timerEl.classList.remove("urgent", "warning");
+  if (secondsLeft < 600) { // Less than 10 minutes
+    timerEl.classList.add("urgent");
+  } else if (secondsLeft < 1800) { // Less than 30 minutes
+    timerEl.classList.add("warning");
+  }
+}
+function togglePredictionTable() {
+      const wrapper = document.getElementById("teamPredictionWrapper");
+      wrapper.classList.toggle("hidden-table");
+    }
+
+function applyCompletedClassOnLoad() {
+  const rows = document.querySelectorAll("#raceTable tbody tr");
+
+  rows.forEach((row) => {
+    const checkbox = row.querySelector(".lap-complete");
+
+    // Only toggle .completed for editable checkboxes (i.e., not fixed DB rows)
+    if (checkbox && !checkbox.disabled) {
+      row.classList.toggle("completed", checkbox.checked);
+    }
+  });
+}
+
+
+
+// Call the function on page load
+document.addEventListener("DOMContentLoaded", () => {
+  applyCompletedClassOnLoad();
+});
+</script>
+<script src="{% static 'e24_app/js/live_results.js' %}"></script>
+</body>
+</html>

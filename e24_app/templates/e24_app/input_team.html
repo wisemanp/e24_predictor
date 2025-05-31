@@ -1,0 +1,10 @@
+<form method="POST" action="{% url 'set_team_id' %}">
+    {% csrf_token %}
+    <label for="team_id">Enter Team ID (AId):</label>
+    <input type="text" id="team_id" name="team_id" required>
+    <br>
+    <label for="is_test">Is this a test?</label>
+    <input type="checkbox" id="is_test" name="is_test">
+    <br>
+    <button type="submit">Submit</button>
+</form>

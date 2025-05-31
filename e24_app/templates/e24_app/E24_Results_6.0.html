@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Endure24 Race Timing</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f4f4f4;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 90%;
+      padding: 4px;
+    }
+
+    button {
+      padding: 4px 10px;
+      font-size: 13px;
+      height: auto;
+    }
+
+    footer {
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #555;
+      text-align: center;
+    }
+
+    .completed {
+      background-color: #d4edda !important;
+    }
+
+    .race-header {
+      display: flex;
+      justify-content: flex-start;
+      margin-top: 20px;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .greyed-out {
+      background-color: #e0e0e0 !important;
+      color: #888;
+    }
+
+
+    .hidden-table {
+      display: none;
+    }
+
+
+    #raceTable thead th {
+      position: sticky;
+      top: 0;
+      background-color: #f4f4f4;
+      z-index: 1;
+    }
+
+    .team-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    #teamPredictions th:first-child,
+    #teamPredictions td:first-child {
+      width: 120px;
+      white-space: nowrap;
+    }
+  
+#runnerCountdowns {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.runner-timer {
+  flex: 1;
+  text-align: center;
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.runner-timer.warning {
+  background-color: #fff3cd !important;
+}
+.runner-timer.urgent {
+  background-color: #f8d7da !important;
+}
+
+#runnerCountdowns {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1000;
+  padding: 10px 0;
+  border-bottom: 2px solid #ccc;
+}
+
+#raceTable thead th {
+  position: sticky;
+  top: 90px;
+  background-color: #f4f4f4;
+  z-index: 2;
+}
+
+
+.runner-name-display {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+.runner-countdown-value {
+  font-size: 1.2em;
+}
+
+.on-course {
+  background-color: #fff9c4 !important;
+}
+.on-course-label {
+  display: block;
+  font-size: 0.9em;
+  color: #000;
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+.next-to-run {
+}
+.next-to-run-label {
+  display: block;
+  font-size: 0.9em;
+  color: #000;
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+.highlight-current {
+  background-color: #fff9c4 !important;
+}
+
+</style>
+</head>
+<body onload="loadData()">
+<h1>Endure24 Race Timing</h1><div id="runnerCountdowns" style="margin-bottom: 20px;"><h2>Next Lap Countdown</h2><div class="runner-timer" data-runner-index="0"><div class="runner-name-display">Runner 1</div><div class="runner-countdown-value">--:--:--</div><div class="on-course-label"></div><div class="next-to-run-label"></div></div><div class="runner-timer" data-runner-index="1"><div class="runner-name-display">Runner 2</div><div class="runner-countdown-value">--:--:--</div><div class="on-course-label"></div><div class="next-to-run-label"></div></div><div class="runner-timer" data-runner-index="2"><div class="runner-name-display">Runner 3</div><div class="runner-countdown-value">--:--:--</div><div class="on-course-label"></div><div class="next-to-run-label"></div></div><div class="runner-timer" data-runner-index="3"><div class="runner-name-display">Runner 4</div><div class="runner-countdown-value">--:--:--</div><div class="on-course-label"></div><div class="next-to-run-label"></div></div><div class="runner-timer" data-runner-index="4"><div class="runner-name-display">Runner 5</div><div class="runner-countdown-value">--:--:--</div><div class="on-course-label"></div><div class="next-to-run-label"></div></div></div>
+<!-- Team Predictions Section -->
+<div class="team-container">
+<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1px;">
+<h2 style="margin: 1;">Team Predictions</h2>
+<button onclick="confirmPopulate()">Populate Predictions</button>
+<button onclick="togglePredictionTable()">Hide/Show Team Predictions</button>
+</div>
+<div id="teamPredictionWrapper">
+<div style="margin-bottom: 10px;">
+<label for="lapCount">Lap Rows:</label>
+<input id="lapCount" min="1" onchange="generateLapRows()" style="width: 60px;" type="number" value="36"/>
+</div>
+<table id="teamPredictions" style="width: 80%; margin-top: 0;">
+  <thead>
+    <tr>
+      <th>Runner</th>
+      <th>Name</th>
+      <th>Predicted Minutes</th>
+      <th>Predicted Seconds</th>
+      <th>D Factor</th>
+      <th>Pace</th>
+    </tr>
+  </thead>
+  <tbody>
+    <script>
+      for (let i = 1; i <= 5; i++) {
+        document.write(`
+          <tr>
+            <td>Runner ${i}</td>
+            <td><input type="text" class="runner-name" placeholder="Name"></td>
+            <td><input type="number" class="runner-minutes" min="0" placeholder="Minutes" oninput="updatePace(${i - 1})"></td>
+            <td><input type="number" class="runner-seconds" min="0" max="59" placeholder="Seconds" oninput="updatePace(${i - 1})"></td>
+            <td><input type="number" class="runner-dfactor" min="1" step="0.01" placeholder="D Factor"></td>
+            <td><span class="runner-pace">-</span></td>
+          </tr>
+        `);
+      }
+    </script>
+  </tbody>
+</table>
+</div>
+</div>
+<!-- Race Results Header -->
+<div class="race-header">Race Results</div>
+<!-- Race Results Table -->
+<table id="raceTable">
+<thead>
+<tr>
+<th>Lap</th>
+<th>Lap Start Time</th>
+<th>Runner</th>
+<th>Laptime</th>
+<th>Pace</th>
+<th>Total Time</th>
+<th>Lap Complete</th>
+</tr>
+</thead>
+<tbody>
+<script>
+function generateLapRows() {
+  const lapTableBody = document.querySelector("#raceTable tbody");
+  lapTableBody.innerHTML = '';
+  const count = parseInt(document.getElementById("lapCount").value) || 36;
+  for (let i = 1; i <= count; i++) {
+    lapTableBody.innerHTML += `
+      <tr>
+        <td>${i}</td>
+        <td class="start-time"></td>
+        <td><input type="text" class="runner-field" placeholder="Runner"></td>
+        <td><input type="text" class="laptime" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();"></td>
+        <td class="pace-cell">-</td>
+        <td class="total-time"></td>
+        <td><input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();"></td>
+      </tr>
+    `;
+  }
+  updateTimes();
+}
+window.addEventListener('load', () => {
+  generateLapRows();
+});
+</script>
+</tbody>
+</table>
+<footer>
+<p>Data is saved locally in your browser's localStorage. It will persist across page reloads and browser restarts.</p>
+</footer>
+<script>
+    function parseTime(str) {
+      const parts = str.split(":").map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return 0;
+      return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    }
+
+    function formatTime(seconds) {
+      const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+      seconds %= 3600;
+      const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const secs = String(seconds % 60).padStart(2, '0');
+      return `${hrs}:${mins}:${secs}`;
+    }
+
+    
+function updateTimes() {
+  const rows = document.querySelectorAll("#raceTable tbody tr");
+  let cumulativeSeconds = 0;
+  const baseTime = new Date();
+  baseTime.setHours(12, 0, 0, 0); // Day 1 start time: 12:00:00
+
+  const cutoffTime = new Date(baseTime.getTime() + 24 * 3600 * 1000); // 24 hours later: 12:00:00 Day 2
+
+  rows.forEach((row) => {
+    const laptimeInput = row.querySelector(".laptime");
+    const totalTimeCell = row.querySelector(".total-time");
+    const startTimeCell = row.querySelector(".start-time");
+    const paceCell = row.querySelector(".pace-cell");
+
+    const laptime = parseTime(laptimeInput.value);
+    const startTime = new Date(baseTime.getTime() + cumulativeSeconds * 1000);
+    startTimeCell.textContent = startTime.toTimeString().substring(0, 8);
+
+    cumulativeSeconds += laptime;
+    totalTimeCell.textContent = formatTime(cumulativeSeconds);
+
+    
+if (laptime > 0) {
+  const pacePerKm = laptime / 8;
+  const paceMinutes = String(Math.floor(pacePerKm / 60)).padStart(2, "0");
+  const paceSeconds = String(Math.round(pacePerKm % 60)).padStart(2, "0");
+  paceCell.textContent = `${paceMinutes}:${paceSeconds}/km`;
+} else {
+  paceCell.textContent = "-";
+}
+
+
+    // Apply greyed-out class if startTime is after cutoff
+    if (startTime > cutoffTime) {
+      row.classList.add("greyed-out");
+    } else {
+      row.classList.remove("greyed-out");
+    }
+  });
+}
+
+
+    function updatePace(index) {
+  const minutes = document.querySelectorAll(".runner-minutes")[index].value;
+  const seconds = document.querySelectorAll(".runner-seconds")[index].value;
+  const paceCell = document.querySelectorAll(".runner-pace")[index];
+
+  const totalSeconds = (parseInt(minutes) || 0) * 60 + (parseInt(seconds) || 0);
+  if (totalSeconds === 0) {
+    paceCell.textContent = "-";
+    return;
+  }
+  const paceSecondsPerKm = totalSeconds / 8;
+  const paceMinutes = Math.floor(paceSecondsPerKm / 60);
+  const paceSeconds = Math.round(paceSecondsPerKm % 60).toString().padStart(2, '0');
+  paceCell.textContent = `${paceMinutes}:${paceSeconds}/km`;
+    }
+
+    function confirmPopulate() {
+      if (confirm("Are you sure?")) {
+        populateRunners();
+        saveData();
+      }
+    }
+
+    function populateRunners() {
+  const nameInputs = document.querySelectorAll(".runner-name");
+  const minuteInputs = document.querySelectorAll(".runner-minutes");
+  const secondInputs = document.querySelectorAll(".runner-seconds");
+  const dfactorInputs = document.querySelectorAll(".runner-dfactor");
+
+  const runners = Array.from(nameInputs).map((input, index) => {
+    return {
+      name: input.value.trim(),
+      minutes: parseInt(minuteInputs[index].value) || 0,
+      seconds: parseInt(secondInputs[index].value) || 0,
+      dfactor: parseFloat(dfactorInputs[index].value) || 1 // Default D Factor is 1
+    };
+  }).filter(runner => runner.name);
+
+  const runnerFields = document.querySelectorAll(".runner-field");
+  const laptimeFields = document.querySelectorAll(".laptime");
+  const checkboxes = document.querySelectorAll(".lap-complete");
+
+  runnerFields.forEach((field, index) => {
+    const checkbox = checkboxes[index];
+    if (!checkbox.checked) {
+      const runner = runners[index % runners.length];
+      if (runner) {
+        field.value = runner.name;
+
+        // Calculate lap time
+        let totalSeconds = runner.minutes * 60 + runner.seconds;
+        if (index >= runners.length) {
+          const previousLapTime = parseTime(laptimeFields[index - runners.length].value);
+          totalSeconds = Math.round(previousLapTime * runner.dfactor);
+        }
+
+        const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+        const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+        const ss = String(totalSeconds % 60).padStart(2, '0');
+        laptimeFields[index].value = `${hh}:${mm}:${ss}`;
+      }
+    }
+  });
+
+  updateTimes();
+}
+
+    function toggleRowCompletion(checkbox) {
+      const row = checkbox.closest("tr");
+      row.classList.toggle("completed", checkbox.checked);
+    }
+
+    function saveData() {
+      const data = {
+        predictions: Array.from(document.querySelectorAll("#teamPredictions tbody tr")).map(row => {
+          return Array.from(row.querySelectorAll("input")).map(input => input.value);
+        }),
+        race: Array.from(document.querySelectorAll("#raceTable tbody tr")).map(row => {
+          return {
+            runner: row.querySelector(".runner-field").value,
+            laptime: row.querySelector(".laptime").value,
+            complete: row.querySelector(".lap-complete").checked
+          };
+        })
+      };
+      localStorage.setItem("raceData", JSON.stringify(data));
+    }
+
+    
+    function togglePredictionTable() {
+      const wrapper = document.getElementById("teamPredictionWrapper");
+      wrapper.classList.toggle("hidden-table");
+    }
+
+    function loadData() {
+      const saved = localStorage.getItem("raceData");
+      if (!saved) return;
+      const data = JSON.parse(saved);
+
+      document.querySelectorAll("#teamPredictions tbody tr").forEach((row, i) => {
+        const inputs = row.querySelectorAll("input");
+        if (data.predictions[i]) {
+          data.predictions[i].forEach((val, j) => inputs[j].value = val);
+        }
+        updatePace(i);
+      });
+
+      document.querySelectorAll("#raceTable tbody tr").forEach((row, i) => {
+        if (data.race[i]) {
+          row.querySelector(".runner-field").value = data.race[i].runner;
+          row.querySelector(".laptime").value = data.race[i].laptime;
+          row.querySelector(".lap-complete").checked = data.race[i].complete;
+          row.classList.toggle("completed", data.race[i].complete);
+        }
+      });
+
+      updateTimes();
+    }
+  </script>
+<script>
+setInterval(updateCountdowns, 1000);
+function highlightPreviousLapRow() {
+  const now = new Date();
+  let closestNegativeDiff = -Infinity;
+  let closestRow = null;
+
+  document.querySelectorAll("#raceTable tbody tr").forEach(row => {
+    row.classList.remove("highlight-current");
+    const startTimeCell = row.querySelector(".start-time");
+    if (startTimeCell && startTimeCell.textContent.includes(":")) {
+      const [h, m, s] = startTimeCell.textContent.split(":").map(Number);
+      const start = new Date();
+      start.setHours(h, m, s, 0);
+      const diff = start - now;
+      if (diff < 0 && diff > closestNegativeDiff) {
+        closestNegativeDiff = diff;
+        closestRow = row;
+      }
+    }
+  });
+
+  if (closestRow) {
+    closestRow.classList.add("highlight-current");
+  }
+}
+setInterval(highlightPreviousLapRow, 1000);
+function markRunnerOnCourse() {
+  const highlightedRow = document.querySelector("#raceTable tbody tr.highlight-current");
+  const countdownEls = document.querySelectorAll(".runner-timer");
+  countdownEls.forEach(el => {
+    el.classList.remove("on-course");
+    el.querySelector(".on-course-label").textContent = "";
+  });
+
+  if (highlightedRow) {
+    const runnerName = highlightedRow.querySelector(".runner-field")?.value.trim();
+    countdownEls.forEach(el => {
+      const displayName = el.querySelector(".runner-name-display").textContent.trim();
+      if (runnerName && displayName.includes(runnerName)) {
+        el.classList.add("on-course");
+        el.querySelector(".on-course-label").textContent = "On Course";
+      }
+    });
+  }
+}
+setInterval(markRunnerOnCourse, 1000);
+function markNextRunner() {
+  const countdownEls = document.querySelectorAll(".runner-timer");
+  let minSeconds = Infinity;
+  let nextRunner = null;
+
+  countdownEls.forEach(el => {
+    el.classList.remove("next-to-run");
+    el.querySelector(".next-to-run-label").textContent = "";
+
+    const timeStr = el.querySelector(".runner-countdown-value").textContent;
+    if (timeStr && timeStr.includes(":")) {
+      const [h, m, s] = timeStr.split(":").map(Number);
+      const total = h * 3600 + m * 60 + s;
+      if (total < minSeconds) {
+        minSeconds = total;
+        nextRunner = el;
+      }
+    }
+  });
+
+  if (nextRunner) {
+    nextRunner.classList.add("next-to-run");
+    nextRunner.querySelector(".next-to-run-label").textContent = "Next to Run";
+  }
+}
+setInterval(markNextRunner, 1000);
+
+function updateCountdowns() {
+  const countdownEls = document.querySelectorAll(".runner-timer");
+  const runnerNames = Array.from(document.querySelectorAll(".runner-name")).map(input => input.value.trim());
+  const rows = document.querySelectorAll("#raceTable tbody tr");
+
+  const now = new Date();
+
+  runnerNames.forEach((name, idx) => {
+    const labelPrefix = name ? name : `Runner ${idx + 1}`;
+    if (!name) {
+      countdownEls[idx].querySelector(".runner-name-display").textContent = labelPrefix;
+      countdownEls[idx].querySelector(".runner-countdown-value").textContent = "--:--:--";
+      return;
+    }
+
+    let nextStart = null;
+
+    for (let row of rows) {
+      const runnerField = row.querySelector(".runner-field");
+      const checkbox = row.querySelector(".lap-complete");
+      const startTimeCell = row.querySelector(".start-time");
+
+      if (!checkbox.checked && runnerField.value.trim() === name) {
+        const timeParts = startTimeCell.textContent.split(":");
+        if (timeParts.length === 3) {
+          const start = new Date();
+          start.setHours(parseInt(timeParts[0]), parseInt(timeParts[1]), parseInt(timeParts[2]), 0);
+          if (start > now) {
+            nextStart = start;
+            break;
+          }
+        }
+      }
+    }
+
+    if (nextStart) {
+      let diff = Math.floor((nextStart - now) / 1000);
+      const hrs = String(Math.floor(diff / 3600)).padStart(2, '0');
+      diff %= 3600;
+      const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+      const secs = String(diff % 60).padStart(2, '0');
+      countdownEls[idx].querySelector(".runner-name-display").textContent = labelPrefix;
+      countdownEls[idx].querySelector(".runner-countdown-value").textContent = `${hrs}:${mins}:${secs}`;
+      updateCountdownColors(countdownEls[idx], Math.floor((nextStart - now) / 1000));
+      updateCountdownColors(countdownEls[idx], Math.floor((nextStart - now) / 1000));
+    } else {
+      countdownEls[idx].querySelector(".runner-name-display").textContent = labelPrefix;
+      countdownEls[idx].querySelector(".runner-countdown-value").textContent = "--:--:--";
+    }
+  });
+}
+
+function updateCountdownColors(timerEl, secondsLeft) {
+  timerEl.classList.remove("urgent", "warning");
+  if (secondsLeft < 600) { // less than 10 minutes
+    timerEl.classList.add("urgent");
+  }
+}
+</script></body>
+</html>
