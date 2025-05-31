@@ -7,11 +7,13 @@ def fetch_results(team_id, test=False):
         url = "https://results.resultsbase.net/myresults.aspx?CId=8&RId=20442&EId=1&AId=539296"
     else:
         url = f"https://results.resultsbase.net/myresults.aspx?CId=8&RId=20854&EId=1&AId={team_id}"
+    print('Fetching results from:', url)
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
     
     # Extract table data
     tables = soup.find_all("table", class_="table table-bordered table-sm small")
+    print('Found tables:', len(tables))
     target_table = tables[0]
     rows = target_table.find_all("tr")
     
