@@ -4,13 +4,32 @@ import pandas as pd
 
 def fetch_results(team_id, test=False):
     if test:
-        url = "https://results.resultsbase.net/myresults.aspx?CId=8&RId=20442&EId=1&AId=539296"
+        url =  "https://wisemanp.github.io/graveyardswiftresults/results.csv"
+        data = pd.read_csv(url)
+        print('got data from github', data)
+        return data.to_dict(orient='records')
+        #url = "https://results.resultsbase.net/myresults.aspx?CId=8&RId=20442&EId=1&AId=539296"
     else:
         url = f"https://results.resultsbase.net/myresults.aspx?CId=8&RId=20854&EId=1&AId={team_id}"
     print('Fetching results from:', url)
-    response = requests.get(url)
-    print(response.status_code, response.reason,response.text)
-    soup = BeautifulSoup(response.text, "html.parser")
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/119.0.0.0 Safari/537.36"
+        ),
+        "Accept": "text/html,application/xhtml+xml",
+        "Accept-Language": "en-US,en;q=0.9",
+    }
+
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        html = response.text
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        html = ""
+    soup = BeautifulSoup(html, "html.parser")
     
     # Extract table data
     tables = soup.find_all("table", class_="table table-bordered table-sm small")
