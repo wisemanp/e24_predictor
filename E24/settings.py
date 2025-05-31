@@ -1,3 +1,4 @@
+import os
 """
 Django settings for E24 project.
 
