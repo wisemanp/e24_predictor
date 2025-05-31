@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: E24
+    env: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn relay_app.wsgi:application"
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: E24.settings
