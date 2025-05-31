@@ -1,0 +1,7 @@
+.hidden-table {
+  display: none;
+}
+
+tr.completed {
+  background-color: #e0ffe0;
+}
