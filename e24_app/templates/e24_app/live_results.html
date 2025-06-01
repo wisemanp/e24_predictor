@@ -581,14 +581,19 @@ setInterval(markNextRunner, 1000);
 
 function updateCountdowns() {
   const countdownEls = document.querySelectorAll(".runner-timer");
-  const rows = document.querySelectorAll("#raceTable tbody tr");
+  const rows = Array.from(document.querySelectorAll("#raceTable tbody tr"));
   const now = new Date();
+
+  // Race start time (today at 12:00:00)
+  const raceStart = new Date();
+  raceStart.setHours(12, 0, 0, 0);
 
   countdownEls.forEach((timerEl) => {
     const runnerName = timerEl.querySelector(".runner-name-display").textContent.trim();
     let nextStart = null;
 
-    rows.forEach((row) => {
+    for (const row of rows) {
+      // Get runner for this row
       let rowRunner = "";
       if (row.querySelector(".runner-field")) {
         rowRunner = row.querySelector(".runner-field").value.trim();
@@ -596,47 +601,53 @@ function updateCountdowns() {
         rowRunner = row.children[2]?.textContent.trim();
       }
 
+      if (rowRunner !== runnerName) continue;
+
+      // Skip completed laps
+      const checkbox = row.querySelector(".lap-complete");
+      if (checkbox?.checked) continue;
+
+      // Parse lap start time (hh:mm:ss)
       const startTimeCell = row.querySelector(".start-time");
-      if (!startTimeCell || !startTimeCell.textContent.includes(":")) return;
+      if (!startTimeCell || !startTimeCell.textContent.includes(":")) continue;
 
       const [h, m, s] = startTimeCell.textContent.split(":").map(Number);
-      const raceStart = new Date();
-      raceStart.setHours(12, 0, 0, 0); // Day 1, 12:00:00
 
-      let start = new Date(raceStart);  // clone
+      // Construct lap start Date object
+      let lapStart = new Date(raceStart);
+      lapStart.setHours(h, m, s, 0);
 
-      // If lap time is earlier than race start (i.e., after midnight), add 1 day
-      if (h < 12) {
-        start.setDate(start.getDate() + 1);  // move to Day 2
+      // If lap time is before race start time (12:00), it means next day
+      if (lapStart < raceStart) {
+        lapStart.setDate(lapStart.getDate() + 1);
       }
-      start.setHours(h, m, s, 0);
 
-      const checkbox = row.querySelector(".lap-complete");
-
-      // Find the **next** start time for this runner in the future
-      if (
-        rowRunner === runnerName &&
-        start > now &&
-        (!nextStart || start < nextStart)
-      ) {
-        nextStart = start;
+      // If lapStart is in the future, that’s the next lap — break the loop
+      if (lapStart > now) {
+        nextStart = lapStart;
+        break;
       }
-    });
+    }
 
-    // Update display
+    // Update countdown display
+    const displayEl = timerEl.querySelector(".runner-countdown-value");
     if (nextStart) {
       const diff = Math.floor((nextStart - now) / 1000);
       const hrs = String(Math.floor(diff / 3600)).padStart(2, "0");
       const mins = String(Math.floor((diff % 3600) / 60)).padStart(2, "0");
       const secs = String(diff % 60).padStart(2, "0");
 
-      timerEl.querySelector(".runner-countdown-value").textContent = `${hrs}:${mins}:${secs}`;
+      displayEl.textContent = `${hrs}:${mins}:${secs}`;
       updateCountdownColors(timerEl, diff);
     } else {
-      timerEl.querySelector(".runner-countdown-value").textContent = "--:--:--";
+      displayEl.textContent = "--:--:--";
     }
   });
 }
+
+
+
+
 
 
 function updateCountdownColors(timerEl, secondsLeft) {
