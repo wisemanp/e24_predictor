@@ -9,7 +9,8 @@ def fetch_results(team_id, test=False):
         print('got data from github', data)
         return data.to_dict(orient='records')
     else:
-        url = f"https://results.resultsbase.net/myresults.aspx?CId=8&RId=20854&EId=1&AId={team_id}"
+        #url = f"https://results.resultsbase.net/myresults.aspx?CId=8&RId=20854&EId=1&AId={team_id}"
+        url = 'dummy'
     print('Fetching results from:', url)
     headers = {
         "User-Agent": (
