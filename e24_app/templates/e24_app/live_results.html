@@ -85,8 +85,8 @@
   }
 
   .completed {
-    background-color: #c1a0da !important; /* Muted green for completed */
-    color: #b6f7c1;
+    background-color: #402456 !important; /* Muted green for completed */
+    color: #fff;
   }
 
   .race-header {
@@ -178,12 +178,16 @@
   .highlight-current {
     background-color:  #5c068c !important;
     color: #fff;
-    border-left: 4px solid #5c068c;
+    border-left: 4px solid #fff;
+    border-top: 2px solid #fff;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
   }
 
   .next-lap {
-    background-color: #fff !important;
+    background-color: #c1a0da !important;
     color: #5c068c;
+    font-weight: bold;
   }
 
   .on-course {
@@ -527,10 +531,10 @@ function generateLapRows() {
 
   // Get the cumulative time after fixed laps from the hidden element
   const cumulativeTimeStr = document.getElementById("cumulativeTime").textContent;
-  let cumulativeSeconds = parseTime(cumulativeTimeStr); // Use cumulativeTime from the backend
+  let cumulativeSeconds = parseTime(cumulativeTimeStr);
 
   const baseTime = new Date();
-  baseTime.setHours(12, 0, 0, 0); // Base start time: 12:00:00
+  baseTime.setHours(12, 0, 0, 0);
 
   // Add rows if the new lap count is greater than the current row count
   for (let i = currentRowCount + 1; i <= lapCount; i++) {
@@ -544,11 +548,13 @@ function generateLapRows() {
       <td><input type="text" class="laptime" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();"></td>
       <td class="pace-cell">-</td>
       <td class="total-time"></td>
-      <td><input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();"></td>
+      <td>
+        <input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();">
+        <input type="checkbox" class="fix-row" onchange="applyFixUpToRow(this)">
+      </td>
     `;
     raceTableBody.appendChild(row);
 
-    // Update cumulative time (default lap time is 0 if not set)
     cumulativeSeconds += 0;
   }
 
@@ -861,10 +867,10 @@ function generateLapRows() {
 
   // Get the cumulative time after fixed laps from the hidden element
   const cumulativeTimeStr = document.getElementById("cumulativeTime").textContent;
-  let cumulativeSeconds = parseTime(cumulativeTimeStr); // Use cumulativeTime from the backend
+  let cumulativeSeconds = parseTime(cumulativeTimeStr);
 
   const baseTime = new Date();
-  baseTime.setHours(12, 0, 0, 0); // Base start time: 12:00:00
+  baseTime.setHours(12, 0, 0, 0);
 
   // Add rows if the new lap count is greater than the current row count
   for (let i = currentRowCount + 1; i <= lapCount; i++) {
@@ -878,11 +884,13 @@ function generateLapRows() {
       <td><input type="text" class="laptime" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();"></td>
       <td class="pace-cell">-</td>
       <td class="total-time"></td>
-      <td><input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();"></td>
+      <td>
+        <input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();">
+        <input type="checkbox" class="fix-row" onchange="applyFixUpToRow(this)">
+      </td>
     `;
     raceTableBody.appendChild(row);
 
-    // Update cumulative time (default lap time is 0 if not set)
     cumulativeSeconds += 0;
   }
 
