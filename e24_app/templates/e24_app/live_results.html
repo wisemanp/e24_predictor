@@ -6,208 +6,257 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Endure24 Race Timing - The Graveyard Swift</title>
 <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      background-color: #c1a0da; /* Background color */
-      color: #333; /* Text color */
-      font-size: 1rem; /* Base font size */
-    }
-
-    h1, h2 {
-      color: #5c068c; /* Highlight color for headings */
-      font-size: 2rem; /* Scales with the base font size */
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 30px;
-      background-color: #fff; /* White background for tables */
-      border: 2px solid #5c068c; /* Highlight border */
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
-
-    th {
-      background-color: #5c068c; /* Highlight color for table headers */
-      color: #fff; /* White text */
-    }
-
-    input[type="number"],
-    input[type="text"] {
-      width: 90%;
-      padding: 4px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      padding: 6px 12px;
-      font-size: 14px;
-      height: auto;
-      background-color: #5c068c; /* Highlight color for buttons */
-      color: #fff; /* White text */
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #4a056e; /* Darker highlight on hover */
-    }
-
-    footer {
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: #555;
-      text-align: center;
-    }
-
-    .completed {
-      background-color: #d4edda !important; /* Light green background */
-      color: #155724; /* Dark green text */
-    }
-
-    .race-header {
-      display: flex;
-      justify-content: flex-start;
-      margin-top: 20px;
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #5c068c; /* Highlight color */
-    }
-
-    .greyed-out {
-      background-color: #e0e0e0 !important; /* Grey background */
-      color: #888; /* Grey text */
-    }
-
-    .hidden-table {
-      display: none;
-    }
-
-    #raceTable thead th {
-      position: sticky;
-      top: 0;
-      background-color: #5c068c; /* Highlight color for sticky headers */
-      color: #fff; /* White text */
-      z-index: 1;
-    }
-
-    .team-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      background-color: #c1a0da; /* Background color for team container */
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    }
-
-    #teamPredictions th:first-child,
-    #teamPredictions td:first-child {
-      width: 120px;
-      white-space: nowrap;
-    }
-
-    #runnerCountdowns {
-      display: flex;
-      flex-wrap: wrap; /* Allow items to wrap on smaller screens */
-      gap: 10px;
-      margin-top: 20px;
-      margin-bottom: 20px;
-      background-color: #c1a0da; /* Background color for countdowns */
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    }
-
-    .runner-timer {
-      flex: 1 1 calc(50% - 10px); /* Adjust width for smaller screens */
-      text-align: center;
-      background-color: #f4f4f4; /* White background for timers */
-      padding: 10px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 1.1em;
-      border: 2px solid #5c068c; /* Highlight border */
-    }
-
-    .runner-timer.warning {
-      background-color: #fff3cd !important; /* Warning background */
-    }
-
-    .runner-timer.urgent {
-      background-color: #f8d7da !important; /* Urgent background */
-    }
-
-    .highlight-current {
-      background-color: #fff9c4 !important; /* Yellow background for current lap */
-    }
-
-    .next-lap {
-      background-color: #f8d7da !important; /* Light red background for next lap */
-      color: #721c24; /* Dark red text */
-    }
-
-    .on-course {
-      background-color: #5c068c !important; /* Highlight color for on-course runner */
-      color: #fff; /* White text */
-    }
-
-    .on-course-label {
-      display: block;
-      font-size: 0.9em;
-      color: #fff; /* White text */
-      margin-top: 6px;
-      font-weight: bold;
-    }
-
-    .next-to-run {
-      background-color: silver !important; /* Silver background for next-to-run */
-      color: #333; /* Dark text */
-    }
-
-    .next-to-run-label {
-      display: block;
-      font-size: 0.9em;
-      color: #333; /* Dark text */
-      margin-top: 6px;
-      font-weight: bold;
-    }
-
-    @media (max-width: 768px) {
   body {
-    padding: 10px; /* Reduce padding for smaller screens */
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #111; /* Black background */
+    color: #e6e6e6; /* Light text */
+    font-size: 1rem;
+  }
+
+  h1, h2 {
+    color: #fff; /* White headings for contrast */
+    font-size: 2rem;
+    text-shadow: 0 2px 8px #5c068c;
   }
 
   table {
-    width: 100%; /* Ensure tables fit within the screen */
-    font-size: 0.9em; /* Reduce font size for smaller screens */
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #181828; /* Very dark for tables */
+    border: 2px solid #5c068c; /* Purple outline */
+    box-shadow: 0 4px 16px rgba(92,6,140,0.2);
   }
 
-  .team-container {
-    flex-direction: column; /* Stack elements vertically */
-    padding: 5px; /* Reduce padding */
+  th, td {
+    border: 1px solid #5c068c; /* Purple cell borders */
+    padding: 8px;
+    text-align: center;
   }
 
-  .runner-timer {
-    font-size: 0.9em; /* Adjust font size for timers */
-    padding: 5px; /* Reduce padding */
+  th {
+    background-color: #181828;
+    color: #c1a0da;
+    border-bottom: 2px solid #5c068c;
+  }
+
+  input[type="number"],
+  input[type="text"] {
+    width: 90%;
+    padding: 4px;
+    border: 1px solid #5c068c;
+    border-radius: 4px;
+    background: #181828;
+    color: #e6e6e6;
+  }
+
+  select {
+    background: #181828;
+    color: #e6e6e6;
+    border: 1px solid #5c068c;
+    border-radius: 4px;
+    padding: 4px;
   }
 
   button {
-    font-size: 12px; /* Smaller buttons for mobile */
-    padding: 4px 8px; /* Adjust button padding */
+    padding: 6px 12px;
+    font-size: 14px;
+    height: auto;
+    background-color: #181828;
+    color: #c1a0da;
+    border: 2px solid #5c068c;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(92,6,140,0.2);
+    transition: background 0.2s, color 0.2s;
   }
-}
-  </style>
+
+  button:hover {
+    background-color: #5c068c;
+    color: #fff;
+  }
+
+  footer {
+    margin-top: 40px;
+    font-size: 0.9em;
+    color: #aaa;
+    text-align: center;
+  }
+
+  .completed {
+    background-color: #223c2a !important; /* Muted green for completed */
+    color: #b6f7c1;
+  }
+
+  .race-header {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 20px;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    border-left: 6px solid #5c068c;
+    padding-left: 12px;
+  }
+
+  .greyed-out {
+    background-color: #222 !important;
+    color: #888;
+  }
+
+  .hidden-table {
+    display: none;
+  }
+
+  #raceTable thead th {
+    position: sticky;
+    top: 0;
+    background-color: #181828;
+    color: #fff;
+    z-index: 1;
+    border-bottom: 2px solid #5c068c;
+  }
+
+  .team-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    background-color: #181828;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(92,6,140,0.2);
+    border: 2px solid #5c068c;
+  }
+
+  #teamPredictions th:first-child,
+  #teamPredictions td:first-child {
+    width: 120px;
+    white-space: nowrap;
+  }
+
+  #runnerCountdowns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: #181828;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(92,6,140,0.2);
+    border: 2px solid #5c068c;
+    flex-direction: row; /* Ensure horizontal layout by default */
+    align-items: stretch;
+  }
+
+  .runner-timer {
+    flex: 1 1 220px;
+    min-width: 180px;
+    max-width: 320px;
+    margin: 0 5px;
+    text-align: center;
+    background-color: #181828;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.1em;
+    border: 2px solid #5c068c;
+    color: #e6e6e6;
+  }
+
+  .runner-timer.warning {
+    background-color: #bfae5e !important;
+    color: #2a203a;
+  }
+
+  .runner-timer.urgent {
+    background-color: #a34d5c !important;
+    color: #fff;
+  }
+
+  .highlight-current {
+    background-color:  #5c068c !important;
+    color: #fff;
+    border-left: 4px solid #5c068c;
+  }
+
+  .next-lap {
+    background-color: #a34d5c !important;
+    color: #fff;
+  }
+
+  .on-course {
+    background-color: #5c068c !important;
+    color: #fff;
+  }
+
+  .on-course-label {
+    display: block;
+    font-size: 0.9em;
+    color: #fff;
+    margin-top: 6px;
+    font-weight: bold;
+  }
+
+  .next-to-run {
+    background-color: #bbb !important;
+    color: #2a203a;
+    border: 2px solid #5c068c;
+  }
+
+  .next-to-run-label {
+    display: block;
+    font-size: 0.9em;
+    color: #2a203a;
+    margin-top: 6px;
+    font-weight: bold;
+  }
+
+  /* Scrollbar styling for dark mode */
+  ::-webkit-scrollbar {
+    width: 10px;
+    background: #181828;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #5c068c;
+    border-radius: 5px;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      padding: 10px;
+    }
+    table {
+      width: 100%;
+      font-size: 0.9em;
+    }
+    .team-container {
+      flex-direction: column;
+      padding: 5px;
+    }
+    .runner-timer {
+      font-size: 0.9em;
+      padding: 5px;
+    }
+    button {
+      font-size: 12px;
+      padding: 4px 8px;
+    }
+  }
+
+  /* Stack vertically on small screens */
+  @media (max-width: 900px) {
+    #runnerCountdowns {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .runner-timer {
+      max-width: 100%;
+      margin: 5px 0;
+    }
+  }
+</style>
 </head>
 <body onload="loadData()">
 {% load static %}
@@ -235,13 +284,13 @@
 <div class="team-container">
   <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1px;">
     <h2 style="margin: 1;">Team Predictions</h2>
-    <button onclick="confirmPopulate()">Populate Predictions</button>
+    <button type="button" onclick="confirmPopulate()">Populate Predictions</button>
     <button onclick="togglePredictionTable()">Hide/Show Team Predictions</button>
   </div>
   <div id="teamPredictionWrapper">
     <div style="margin-bottom: 10px;">
       <label for="lapCount">Lap Rows:</label>
-      <input id="lapCount" min="1" onchange="generateLapRows()" style="width: 60px;" type="number" value="30"/>
+      <input id="lapCount" min="1" onchange="generateLapRows(); saveData();" style="width: 60px;" type="number" value="30"/>
     </div>
     <table id="teamPredictions" style="width: 80%; margin-top: 0;">
       <thead>
@@ -250,14 +299,15 @@
           <th>Predicted Minutes</th>
           <th>Predicted Seconds</th>
           <th>D Factor</th>
-          <th>Pace</th>
+          <th>Pace (first lap)</th>
+          <th>Time Lost (sec/lap)</th>
         </tr>
       </thead>
       <tbody>
         {% for runner in runners %}
         <tr>
           <td>
-            <select class="runner-dropdown">
+            <select class="runner-dropdown" onchange="saveData();">
               <option value="">Select Runner</option>
               {% for runner_option in runners %}
               <option value="{{ runner_option.name }}">{{ runner_option.name }}</option>
@@ -265,15 +315,16 @@
             </select>
           </td>
           <td>
-            <input type="number" class="runner-minutes" min="0" placeholder="Minutes">
+            <input type="number" class="runner-minutes" min="0" placeholder="Minutes" oninput="updatePace(this); saveData();">
           </td>
           <td>
-            <input type="number" class="runner-seconds" min="0" max="59" placeholder="Seconds">
+            <input type="number" class="runner-seconds" min="0" max="59" placeholder="Seconds" oninput="updatePace(this); saveData();">
           </td>
           <td>
-            <input type="number" class="runner-dfactor" min="1" step="0.01" placeholder="D Factor" value="1.05">
+            <input type="number" class="runner-dfactor" min="1" step="0.01" placeholder="D Factor" value="1.05" oninput="updatePace(this); saveData();">
           </td>
           <td><span class="runner-pace">-</span></td>
+          <td><span class="runner-time-lost">-</span></td>
         </tr>
         {% endfor %}
       </tbody>
@@ -297,55 +348,55 @@
   </thead>
   <tbody>
     {% for lap in laps %}
-    <tr class="{% if lap.fixed %}completed{% endif %}" 
-    {% if not lap.completed and not lap.runner_field and lap.fixed %}data-fixed-prediction="true"{% endif %}>
-
-      <td>{{ lap.number }}</td>
-      <td class="start-time">
-        {% if lap.fixed %}
-          {{ lap.start_time }}
-        {% else %}
-          <input type="text" class="start-time-input" value="{{ lap.start_time }}" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();">
-        {% endif %}
-      </td>
-      <td>
-        {% if lap.fixed %}
-          {{ lap.runner }}
-        {% else %}
-          <input type="text" class="runner-field" value="{{ lap.runner }}" placeholder="Runner">
-        {% endif %}
-      </td>
-      <td>
-        {% if lap.fixed %}
-          {{ lap.laptime }}
-        {% else %}
-          <input type="text" class="laptime" value="{{ lap.laptime }}" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();">
-        {% endif %}
-      </td>
-      <td class="pace-cell">
-        {% if lap.fixed %}
-          {{ lap.pace }}
-        {% else %}
-          <span class="pace-cell">-</span>
-        {% endif %}
-      </td>
-      <td class="total-time">
-        {% if lap.fixed %}
-          {{ lap.total_time }}
-        {% else %}
-          <span class="total-time">-</span>
-        {% endif %}
-      </td>
-      <td>
-        {% if lap.fixed %}
-          <input type="checkbox" class="lap-complete" checked disabled>
-        {% else %}
-          <input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();">
-        {% endif %}
-        <input type="checkbox" class="fix-row" onchange="applyFixUpToRow(this)">
-      </td>
-      
-    </tr>
+    {% if lap.fixed %}
+      <tr class="completed">
+        <td>{{ lap.number }}</td>
+        <td class="start-time">
+          {% if lap.fixed %}
+            {{ lap.start_time }}
+          {% else %}
+            <input type="text" class="start-time-input" value="{{ lap.start_time }}" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();">
+          {% endif %}
+        </td>
+        <td>
+          {% if lap.fixed %}
+            {{ lap.runner }}
+          {% else %}
+            <input type="text" class="runner-field" value="{{ lap.runner }}" placeholder="Runner">
+          {% endif %}
+        </td>
+        <td>
+          {% if lap.fixed %}
+            {{ lap.laptime }}
+          {% else %}
+            <input type="text" class="laptime" value="{{ lap.laptime }}" placeholder="HH:MM:SS" oninput="updateTimes(); saveData();">
+          {% endif %}
+        </td>
+        <td class="pace-cell">
+          {% if lap.fixed %}
+            {{ lap.pace }}
+          {% else %}
+            <span class="pace-cell">-</span>
+          {% endif %}
+        </td>
+        <td class="total-time">
+          {% if lap.fixed %}
+            {{ lap.total_time }}
+          {% else %}
+            <span class="total-time">-</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if lap.fixed %}
+            <input type="checkbox" class="lap-complete" checked disabled>
+          {% else %}
+            <input type="checkbox" class="lap-complete" onchange="toggleRowCompletion(this); saveData();">
+          {% endif %}
+          <input type="checkbox" class="fix-row" onchange="applyFixUpToRow(this)">
+        </td>
+        
+      </tr>
+    {% endif %}
     {% endfor %}
   </tbody>
 </table>
@@ -420,26 +471,37 @@ function updateTimes() {
 
     function updatePace(inputEl) {
   const row = inputEl.closest("tr");
-  const minutes = row.querySelector(".runner-minutes").value;
-  const seconds = row.querySelector(".runner-seconds").value;
+  const minutes = parseInt(row.querySelector(".runner-minutes").value) || 0;
+  const seconds = parseInt(row.querySelector(".runner-seconds").value) || 0;
+  const dfactor = parseFloat(row.querySelector(".runner-dfactor").value) || 1;
   const paceCell = row.querySelector(".runner-pace");
+  const timeLostCell = row.querySelector(".runner-time-lost");
 
-  const totalSeconds = (parseInt(minutes) || 0) * 60 + (parseInt(seconds) || 0);
-  if (totalSeconds === 0) {
+  // Calculate original lap time in seconds (no D-Factor)
+  let baseSeconds = minutes * 60 + seconds;
+  if (baseSeconds === 0) {
     paceCell.textContent = "-";
+    timeLostCell.textContent = "-";
     return;
   }
-  const paceSecondsPerKm = totalSeconds / 8; // Assuming 8 km per lap
+
+  // Pace per km (no D-Factor)
+  const paceSecondsPerKm = baseSeconds / 8;
   const paceMinutes = Math.floor(paceSecondsPerKm / 60);
   const paceSeconds = Math.round(paceSecondsPerKm % 60).toString().padStart(2, '0');
   paceCell.textContent = `${paceMinutes}:${paceSeconds}/km`;
-    }
 
+  // Time lost per lap due to D-Factor
+  const dLapSeconds = Math.round(baseSeconds * dfactor);
+  const timeLost = dLapSeconds - baseSeconds;
+  timeLostCell.textContent = timeLost > 0 ? `+${timeLost}` : "0";
+}
     function confirmPopulate() {
   console.log("Confirm Populate triggered");
-  if (confirm("Are you sure?")) {
+  if (confirm("Are you sure you want to populate predictions?")) {
     populateRunners();
     saveData();
+    loadData(); // <-- Add this line if you want to force a UI refresh
   }
 }
 
@@ -459,7 +521,7 @@ function updateTimes() {
     
 
 function generateLapRows() {
-  const lapCount = parseInt(document.getElementById("lapCount").value) || 0;
+  const lapCount = parseInt(document.getElementById("lapCount")?.value) || 0;
   const raceTableBody = document.querySelector("#raceTable tbody");
   const currentRowCount = raceTableBody.querySelectorAll("tr").length;
 
@@ -684,20 +746,27 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 function saveData() {
   const fixedLaps = parseInt(document.getElementById("fixedLapCount")?.textContent) || 0;
+  const lapCount = parseInt(document.getElementById("lapCount")?.value) || 0;
+
+  // Only save editable rows (those with .runner-field)
+  const editableRows = Array.from(document.querySelectorAll("#raceTable tbody tr"))
+    .filter(row => row.querySelector(".runner-field"));
 
   const data = {
+    lapCount: lapCount,
     predictions: Array.from(document.querySelectorAll("#teamPredictions tbody tr")).map(row => {
       const dropdown = row.querySelector(".runner-dropdown");
       const minutes = row.querySelector(".runner-minutes")?.value || 0;
       const seconds = row.querySelector(".runner-seconds")?.value || 0;
+      const dfactor = row.querySelector(".runner-dfactor")?.value || 1;
       return {
         runner: dropdown?.value || "",
         minutes: parseInt(minutes),
         seconds: parseInt(seconds),
+        dfactor: parseFloat(dfactor)
       };
     }),
-
-    race: Array.from(document.querySelectorAll("#raceTable tbody tr")).map((row, index) => {
+    race: editableRows.map((row, index) => {
       const runnerField = row.querySelector(".runner-field");
       const laptimeField = row.querySelector(".laptime");
       const checkbox = row.querySelector(".lap-complete");
@@ -709,22 +778,10 @@ function saveData() {
         runner: runnerField.value,
         laptime: laptimeField.value,
         complete: checkbox?.checked || false,
-        fixed_prediction: row.hasAttribute("data-fixed-prediction") // Add fixed_prediction attribute
+        fixed_prediction: row.hasAttribute("data-fixed-prediction")
       };
     }).filter(row => row !== null)
   };
-
-  fetch('/save-predictions/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value,
-    },
-    body: JSON.stringify(data),
-  })
-  .then(response => response.json())
-  .then(data => console.log('Save response:', data))
-  .catch(error => console.error('Error saving data:', error));
 
   localStorage.setItem("raceData", JSON.stringify(data));
 }
@@ -734,27 +791,40 @@ function loadData() {
   if (!saved) return;
   const data = JSON.parse(saved);
 
+  // Restore lap count and generate rows
+  if (data.lapCount) {
+    const lapCountInput = document.getElementById("lapCount");
+    if (lapCountInput) {
+      lapCountInput.value = data.lapCount;
+      generateLapRows(); // Ensure correct number of rows before restoring race data
+    }
+  }
+
   // Restore team predictions
   const predictionRows = document.querySelectorAll("#teamPredictions tbody tr");
   predictionRows.forEach((row, i) => {
     const dropdown = row.querySelector(".runner-dropdown");
     const minutesInput = row.querySelector(".runner-minutes");
     const secondsInput = row.querySelector(".runner-seconds");
+    const dfactorInput = row.querySelector(".runner-dfactor");
 
     const savedPrediction = data.predictions[i];
     if (savedPrediction) {
       if (dropdown) dropdown.value = savedPrediction.runner;
       if (minutesInput) minutesInput.value = savedPrediction.minutes;
       if (secondsInput) secondsInput.value = savedPrediction.seconds;
-
+      if (dfactorInput) dfactorInput.value = savedPrediction.dfactor;
       updatePace(minutesInput); // recalculate pace cell
     }
   });
 
-  // Restore predicted race rows (non-fixed only)
-  const raceRows = document.querySelectorAll("#raceTable tbody tr");
+  // Restore predicted race rows (skip fixed rows)
+  const raceRows = Array.from(document.querySelectorAll("#raceTable tbody tr"));
+  // Only editable rows (those with .runner-field input)
+  const editableRows = raceRows.filter(row => row.querySelector(".runner-field"));
+
   data.race.forEach((lap, i) => {
-    const row = raceRows[i];
+    const row = editableRows[i];
     if (!row) return;
 
     const runnerField = row.querySelector(".runner-field");
@@ -764,18 +834,17 @@ function loadData() {
     if (runnerField) runnerField.value = lap.runner;
     if (laptimeField) laptimeField.value = lap.laptime;
     if (checkbox && !checkbox.disabled) {
-    checkbox.checked = lap.complete;
-}
+      checkbox.checked = lap.complete;
+    }
 
-
-    // ✅ Only set data-fixed-prediction on editable rows
+    // Only set data-fixed-prediction on editable rows
     if (lap.fixed_prediction && runnerField) {
       row.setAttribute("data-fixed-prediction", "true");
       const fixBox = row.querySelector(".fix-row");
       if (fixBox) fixBox.checked = true;
     }
 
-    // ✅ Only apply .completed class to editable rows
+    // Only apply .completed class to editable rows
     if (checkbox && !checkbox.disabled) {
       row.classList.toggle("completed", checkbox.checked);
     }
@@ -786,7 +855,7 @@ function loadData() {
 
 
 function generateLapRows() {
-  const lapCount = parseInt(document.getElementById("lapCount").value) || 0;
+  const lapCount = parseInt(document.getElementById("lapCount")?.value) || 0;
   const raceTableBody = document.querySelector("#raceTable tbody");
   const currentRowCount = raceTableBody.querySelectorAll("tr").length;
 
@@ -828,7 +897,8 @@ function confirmPopulate() {
   console.log("Confirm Populate triggered");
   if (confirm("Are you sure you want to populate predictions?")) {
     populateRunners();
-    saveData(); // Ensure saveData is defined elsewhere
+    saveData();
+    loadData(); // <-- Add this line if you want to force a UI refresh
   }
 }
 
@@ -986,6 +1056,6 @@ function applyFixUpToRow(checkbox) {
 }
 
 </script>
-<script src="{% static 'e24_app/js/live_results.js' %}"></script>
+
 </body>
 </html>

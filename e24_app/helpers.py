@@ -8,7 +8,6 @@ def fetch_results(team_id, test=False):
         data = pd.read_csv(url)
         print('got data from github', data)
         return data.to_dict(orient='records')
-        #url = "https://results.resultsbase.net/myresults.aspx?CId=8&RId=20442&EId=1&AId=539296"
     else:
         url = f"https://results.resultsbase.net/myresults.aspx?CId=8&RId=20854&EId=1&AId={team_id}"
     print('Fetching results from:', url)
@@ -28,12 +27,17 @@ def fetch_results(team_id, test=False):
         html = response.text
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
-        html = ""
+        return []  # Return empty results if request fails
+
     soup = BeautifulSoup(html, "html.parser")
     
     # Extract table data
     tables = soup.find_all("table", class_="table table-bordered table-sm small")
     print('Found tables:', len(tables))
+    if not tables:
+        print("No results table found for this team_id.")
+        return []  # Return empty results if no table found
+
     target_table = tables[0]
     rows = target_table.find_all("tr")
     
@@ -51,9 +55,5 @@ def fetch_results(team_id, test=False):
             "Leg Time": leg_time
         })
     
-    # If this is a test, limit the data to simulate halfway-through-the-race
-    #if test:
-        #halfway_index = len(data) // 2
-        #data = data[:halfway_index]
     print('GOT DATA', data)
     return pd.DataFrame(data).to_dict(orient='records')

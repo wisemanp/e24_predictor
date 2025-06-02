@@ -22,7 +22,7 @@ def input_team(request):
                 default_runners = ['Mark Mcqueen', 'Andrew Prestidge', 
                                    'James Symonds', 'Matthew Clark', 'Miranda Bates']
             else:
-                # TODO: Check that these are the correct names
+                
                 default_runners = ['Phil Wiseman', 'Steve Wills', 
                                    'Mike McGonigle', 'Anna Richardson', 'David Bittlestone']
             for name in default_runners:
@@ -78,6 +78,17 @@ def live_results(request):
 
     # Fetch live results from the helper function
     results = fetch_results(team_id, test=is_test)
+
+    # If results is empty, skip DB update and render empty table
+    if not results:
+        print("No results found, rendering empty results table.")
+        return render(request, 'e24_app/live_results.html', {
+            'laps': [],
+            'runners': Runner.objects.all(),
+            'total_laps': 0,
+            'cumulative_time': "00:00:00",
+            'range_1_to_5': range(1, 6),
+        })
 
     # Base start time for the race (e.g., 12:00:00)
     base_time_of_day = datetime.combine(datetime.today(), time(12, 0, 0))  # Start at 12:00:00
@@ -136,9 +147,8 @@ def live_results(request):
 
     # Query the database for laps and runners
     laps = Lap.objects.all().order_by('number')
-    print(laps)
     runners = Runner.objects.all()
-
+    
     # Prepare data for the template
     lap_data = []
     for lap in laps:
