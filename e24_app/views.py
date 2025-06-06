@@ -1,13 +1,25 @@
+USE_GITHUB_RESULTS = False  # Set to True for production, False for team_id/session mode
+
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 import json
 from datetime import timedelta, datetime, time
-from .models import Lap, Runner
+from .models import Lap, Runner, Prediction
 from .helpers import fetch_results
 
 # Store the team ID in memory for simplicity (or use a database)
 team_id = None
+
+# Define runner colors using HUSL palette
+runner_colors = {
+    "Phil Wiseman": "#f6706c",
+    "Steve Wills": "#f6c26c",
+    "Mike McGonigle": "#b7f66c",
+    "Anna Richardson": "#6cf6c2",
+    "David Bittlestone": "#6c9af6",
+    # Add more as needed
+}
 
 def input_team(request):
     if request.method == 'POST':
@@ -18,12 +30,7 @@ def input_team(request):
 
         # Preload the database with 5 runners if no runners exist
         if Runner.objects.count() == 0:
-            if is_test:
-                default_runners = ['Mark Mcqueen', 'Andrew Prestidge', 
-                                   'James Symonds', 'Matthew Clark', 'Miranda Bates']
-            else:
-                
-                default_runners = ['Phil Wiseman', 'Steve Wills', 
+            default_runners = ['Phil Wiseman', 'Steve Wills', 
                                    'Mike McGonigle', 'Anna Richardson', 'David Bittlestone']
             for name in default_runners:
                 Runner.objects.create(name=name)
@@ -69,15 +76,15 @@ def format_timedelta(td):
     return f"{hours:02}:{minutes:02}:{seconds:02}"
 
 def live_results(request):
-    # Retrieve team_id and is_test from the session
-    team_id = request.session.get('team_id')
-    is_test = request.session.get('is_test', False)
-
-    if not team_id:
-        return redirect('set_team_id')  # Redirect to input_team if team_id is not set
-
-    # Fetch live results from the helper function
-    results = fetch_results(team_id, test=is_test)
+    if USE_GITHUB_RESULTS:
+        # Always use GitHub CSV, ignore team_id/session
+        results = fetch_results(team_id=None, test=True)
+        is_test=False
+    else:
+        # Retrieve team_id and is_test from the session
+        team_id = request.session.get('team_id')
+        is_test = request.session.get('is_test', False)
+        results = fetch_results(team_id, test=is_test)
 
     # If results is empty, skip DB update and render empty table
     if not results:
@@ -172,6 +179,7 @@ def live_results(request):
         'total_laps': laps.count(),
         'cumulative_time': format_timedelta(cumulative_time),  # Pass cumulative time
         'range_1_to_5': range(1, 6),  # Add this to the context
+        'runner_colors': runner_colors,  # Pass runner colors to the template
     })
 
 @csrf_exempt
@@ -189,33 +197,30 @@ def save_human_inputs(request):
 
 @csrf_exempt
 def save_predictions(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            race_data = data.get('race', [])
-
-            for entry in race_data:
-                lap_number = entry.get('number')
-                runner_name = entry.get('runner')
-                laptime_str = entry.get('laptime')
-
-                if not lap_number or not runner_name or not laptime_str:
-                    continue
-
-                runner, _ = Runner.objects.get_or_create(name=runner_name)
-                lap, _ = Lap.objects.get_or_create(number=lap_number)
-
-                if not lap.fixed:
-                    lap.runner = runner
-                    lap.laptime = parse_leg_time(laptime_str)
-                    lap.fixed = False
-                    lap.save()
-
-            return JsonResponse({'status': 'success'})
-        except Exception as e:
-            print("Error in save_predictions:", str(e))
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
+    if request.method == "POST":
+        Prediction.objects.all().update(current=False)
+        import json
+        data = json.loads(request.body)
+        for pred in data.get('predictions', []):
+            Prediction.objects.create(
+                runner=pred['runner'],
+                laptime=pred.get('laptime', ''),
+                fixed=pred.get('fixed', False),
+                current=True
+            )
+        return JsonResponse({'status': 'ok'})
     return JsonResponse({'status': 'error'}, status=400)
+
+def load_predictions(request):
+    preds = Prediction.objects.filter(current=True)
+    data = [
+        {
+            'runner': p.runner,
+            'laptime': p.laptime,
+            'fixed': p.fixed,
+        }
+        for p in preds
+    ]
+    return JsonResponse({'predictions': data})
 
 

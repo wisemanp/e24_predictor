@@ -11,3 +11,9 @@ class Lap(models.Model):
     pace = models.CharField(max_length=20, null=True, blank=True)
     total_time = models.DurationField(null=True, blank=True)
     fixed = models.BooleanField(default=False)  # True if fetched from the official website
+
+class Prediction(models.Model):
+    runner = models.CharField(max_length=100)
+    laptime = models.CharField(max_length=20, blank=True)
+    fixed = models.BooleanField(default=False)
+    current = models.BooleanField(default=False)
